@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const MONGODB_URL = process.env.MONGO_DB_URL;
 const app = express();
 const userRouter = require("./routes/userApi");
-const port = 3000;
+const port = process.env.PORT || 3000;
 const AccessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 mongoose
   .connect(MONGODB_URL, {

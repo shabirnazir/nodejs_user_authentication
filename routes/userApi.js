@@ -2,7 +2,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
 const user = require("../Schemas/userSchema");
 
 const router = express.Router();
@@ -79,8 +78,22 @@ router.post("/update", authenticateUser, async (req, res) => {
     if (!userData) {
       return res.status(400).send("Cannot find user");
     }
+    // compare password
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      userData.password
+    );
+    if (!validPassword) {
+      return res.status(400).send("Cannot find user");
+    }
+    // update password
     userData.password = req.body.password;
     await userData.save();
+    req.user = userData;
+    const token = userData.generateAuthToken();
+    res.cookie("token", token, {
+      httpOnly: true,
+    });
     res.send("Password updated");
   } catch (error) {
     console.log(error);
